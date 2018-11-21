@@ -55,7 +55,9 @@ h1 {
 	display: table-cell;
 	width: 0.60cm;
 	height: 0.60cm;
-	min-width: height;
+	min-width: 0.60cm;
+	min-width: 0.60cm;
+	
 
 	text-align: center;
 
