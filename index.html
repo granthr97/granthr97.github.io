@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+    	<title>minesweeper</title>
+    	<meta charset="utf-8"/>
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    	<link href="https://fonts.googleapis.com/css?family=Jura" rel="stylesheet">
+   	    <link rel="stylesheet" href="./style.css">
+   	    <script src="./code.js"></script>
+	</head>
+<body>
+	<h1 id="title">minesweeper</h1>
+	<div id="game">
+		<div id="display">
+			<span class = "display">
+				<div class = 'displaytitle'>mines</div>
+				<div class = 'number' id = "minesleft"></div>
+			</span>
+			<span class = "display">
+				<div class = 'displaytitle'>time</div>
+				<div class = 'number' id = "time">00:00:00.0</div>
+			</span>	
+			<span class = "display" id = 'bestcontainer'>
+				<span>
+					<div class = 'displaytitle'>best</div>
+					<div class = 'number' id = "bestscore">..:..:....</div>
+				</span>
+			</span>
+		</div>
+		<div id = "grid_container">
+			<div id="grid">				
+			</div>
+		</div>
+	</div>
+	<div id = "settings">
+		<div class = 'optionlist' id = 'minelist'>
+			<h3 class = 'option'>mines:</h3>
+			<button class = 'button settingsbutton'><span>beginner</span></button>
+			<button class = 'button settingsbutton'><span>easy</span></button>
+			<button class = 'button settingsbutton'><span>medium</span></button>
+			<button class = 'button settingsbutton'><span>hard</span></button>
+			<button class = 'button settingsbutton'><span>extreme</span></button>
+			<div class = "slider">
+				<input id = mineinput type="range" min="0" max="2000" value="1000">
+				<p>10</p>
+			</div>
+		</div>
+		<div class = 'optionlist' id = 'widthlist'>
+			<h3 class = 'option'>width:</h3>
+			<button class = 'button settingsbutton'><span>tiny</span></button>
+			<button class = 'button settingsbutton'><span>small</span></button>
+			<button class = 'button settingsbutton'><span>medium</span></button>
+			<button class = 'button settingsbutton'><span>large</span></button>
+			<button class = 'button settingsbutton'><span>extreme</span></button>
+			<div class = "slider">
+				<input id = 'widthinput' type="range" min="0" max="2000" value="1000">
+				<p>24</p>
+			</div>
+		</div>
+		<div class = 'optionlist' id = 'heightlist'>
+			<h3 class = 'option'>height:</h3>
+			<button class = 'button settingsbutton'><span>tiny</span></button>
+			<button class = 'button settingsbutton'><span>small</span></button>
+			<button class = 'button settingsbutton'><span>medium</span></button>
+			<button class = 'button settingsbutton'><span>large</span></button>
+			<button class = 'button settingsbutton'><span>extreme</span></button>
+			<div class = "slider">
+				<input id="heightinput" type="range" min="0" max="2000" value="1000">
+				<p>19</p>
+			</div>
+		</div>
+	</div>
+	<div id = "controls">
+		<button class = 'button navbutton backbutton' id="backnav"><span>Back</span></button>
+		<button class = 'button navbutton fwdbutton' id="settingsnav"><span>Settings</span></button>
+		<button class = 'button navbutton fwdbutton' id="newgame"><span>New Game </span></button>
+	</div>
+</body>
