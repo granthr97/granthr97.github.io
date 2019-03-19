@@ -491,11 +491,12 @@ $(document).ready(function(){
 	//  change display, update best score
 	function win(){
 		running = false;		// Disables input and timer
-		if (!localStorage.endTime){
+		
+		if (!localStorage.endTime){	// If there is no end time recorded in localStorage from a previous game
 			localStorage.endTime = currentTime;
-			checkBest();
+			checkBest();		// Check if this is the best time
 		} else {
-			setTime(localStorage.endTime);
+			setTime(localStorage.endTime); // Set the time to the time recorded in the previously won game
 		}
 		$('#grid').addClass('won');
 		$('#minesleft').html('0');
@@ -701,6 +702,7 @@ $(document).ready(function(){
 		if (localStorage['mines:'] == null){	// initialize mines to medium
 			localStorage['mines:'] = 'medium';
 		}
+		
 		if (localStorage['mines:'] != 'custom'){
 			select($('#minelist').children()[1 + mineMap[localStorage['mines:']]]);
 		} else {
@@ -710,6 +712,7 @@ $(document).ready(function(){
 		if (localStorage['width:'] == null){	// initialize width to medium
 			localStorage['width:'] = 'medium';
 		}
+		
 		if (localStorage['width:'] != 'custom'){
 			select($('#widthlist').children()[1 + sizeMap[localStorage['width:']]]);
 		} else {
@@ -719,6 +722,7 @@ $(document).ready(function(){
 		if (localStorage['height:'] == null){	// initialize height to medium
 			localStorage['height:'] = 'medium';
 		}
+		
 		if (localStorage['height:'] != 'custom'){
 			select($('#heightlist').children()[1 + sizeMap[localStorage['height:']]]);
 		} else {
