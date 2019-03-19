@@ -1,8 +1,18 @@
 "use strict";
 $(document).ready(function(){
+	
+	// Width & height: number of rows and columns of the grid
 	var width, height;
+	
+	// blockList: list containing Block objects representing relevant data
+	// mineList: list containing Block objects that are mines
 	var blockList, mineList;
+	
+	// lost, running: booleans indicating whether the game has been lost or is running
+	// totalMines: number of mines (whether flagged or unflagged)
 	var lost, running, totalMines, totalFlagged, uncoveredBlocks;
+	
+	// Timing information
 	var currentTime, startDate, timerID;
 
 	$('#grid').contextmenu(event => event.preventDefault());
@@ -44,6 +54,7 @@ $(document).ready(function(){
 		running = false;
 		blockList = [], mineList = [];
 		uncoveredBlocks = 0;
+		
 		clearInterval(timerID);
 		setTime(0);
 		displayBest();
@@ -52,7 +63,11 @@ $(document).ready(function(){
 
 	// Create a grid of uncovered, untouched blocks depending on height and width.
 	function createGrid() {
+		
+		// Clear rows & blocks inside the grid
 		grid.innerHTML = '';
+		
+		// Remove these classes in case the previous game had been won or lost
 		$('#grid').removeClass("won lost");
 		running = true;
 
@@ -70,14 +85,18 @@ $(document).ready(function(){
 			}
 		}
 
-		// Left-clicking uncovers the block.
-		// Shift-clicking flags the block.
+		
+		
 		$('.block').click(function(e) {
 			let row = $(this).parent().index();
 			let column = $(this).index();
 			let block = getBlock(row, column);
+			
+			// Left-clicking uncovers the block.
 			if (!e.shiftKey){
 				block.click(false);
+				
+			// Shift-clicking flags the block.
 			} else {
 				block.rightClick(false);
 			}
@@ -91,12 +110,14 @@ $(document).ready(function(){
 		});
 	}
 
-	// If there was no previously loaded game, we do nothing.
-	// Otherwise, load the mine locations, clicks, and relevant time information.
 	function loadGame(){
+		
+		// If there was no previously loaded game, we do nothing.
 		if (!localStorage.savedClicks) {
 			return;
 		}
+		
+		// Otherwise, load the mine locations, clicks, and relevant time information.
 		loadMines();
 		loadClicks();
 		resumeTimer();
@@ -106,6 +127,8 @@ $(document).ready(function(){
 	function loadMines(){
 		let loadedMines = localStorage.savedMines;
 		for (let n = 0; n < loadedMines.length; n+= 2){
+			
+			// Each mine location is represented its (1) row and (2) column, each encoded as a character
 			let i = loadedMines[n].charCodeAt();
 			let j = loadedMines[n + 1].charCodeAt();
 			let block = getBlock(i, j);
@@ -114,10 +137,12 @@ $(document).ready(function(){
 		}
 	}
 
-	//  Load the sequence of clicks to recreate the minefield.
-	//	Each click has three ASCII-encoded integers: row, column, and type of click (uncover or flag).
+	//  Load and replay the sequence of clicks from the previous game to recreate the minefield.
 	function loadClicks(){
 		let loadedClicks = localStorage.savedClicks;
+		
+		// Each click is recorded by the (1) block row, (2) column row, and (3) whether it was a left- or right- click.
+		// Each piece of information is encoded as a character.
 		for (let n = 0; n < loadedClicks.length; n+= 3){
 			let i = loadedClicks[n].charCodeAt();
 			let j = loadedClicks[n + 1].charCodeAt();
@@ -128,6 +153,8 @@ $(document).ready(function(){
 			} else if (type == 1) {
 				block.rightClick(true);
 			}
+			
+			// Determine whether game has been won or lost
 			evaluateGame();
 		}
 	}
@@ -147,16 +174,18 @@ $(document).ready(function(){
 		let widthtype = localStorage['width:'];
 		let key = minetype + heighttype + widthtype;
 		if ((minetype == 'custom') || (heighttype == 'custom') || (widthtype == 'custom')){
+			// Only record high scores for non-custom game modes
 			return 'custom';
 		} else if (!localStorage[key]){
+			// Initialize an unrecorded high score to be infinity
 			return (1 / 0);
 		} else {
 			return localStorage[key];
 		}
 	}
 
-	// Upon winning a game, determine whether the time is the best for that particular
-	// combination of difficulties, if so, update the best score.
+	// Upon winning a game, determine whether the time is the best for that particular combination of difficulties.
+	// If so, update the best score.
 	function checkBest(){
 		let curBest = getBest();
 		if (curBest == 'custom') {
@@ -167,8 +196,7 @@ $(document).ready(function(){
 		} 
 	}
 
-	// Execute when a game is won with a new best time for that particular combination 
-	// of dificulties.
+	// Executes when a game is won with a new best time for that particular combination of difficulties.
 	function newBest(time){
 			let minetype = localStorage['mines:'];
 			let heighttype = localStorage['height:'];
@@ -188,11 +216,11 @@ $(document).ready(function(){
 
 	// Initialize a block and associate it with its corresponding HTML elements
 	function Block(row, column, block) {
-		this.row = row;				// Coordinates
+		this.row = row;			// Coordinates
 		this.column = column;
-
-		this.element = block;		// HTML element
-
+		
+		this.element = block;		// Reference to the HTML element
+		
 		this.adjacentMines = 0;		// Initialize values
 		this.adjacentFlags = 0;
 		this.mine = false;
@@ -201,28 +229,39 @@ $(document).ready(function(){
 
 		// Executes upon left-click (or loading a left-click)
 		this.click = function(loaded){
+			
+			// Ignore clicks if the game has stopped or if the block has been flagged
 			if (!running || this.flagged){
 				return;
 			}
 			this.uncover();
+			
+			// Check if the game has been won or lost
 			evaluateGame();
+			
+			// Loaded: indicates whether this is a loaded click or a new click. We don't want to re-record 
+			// clicks while we load them!
 			if (!loaded){
 				saveClick(this.row, this.column, 0);
 			}
 		};
 
 		// Executes upon right/shift-click, (or loaded right/shift-click)
-		this.rightClick = function(loaded){	
+		this.rightClick = function(loaded){
+			
+			// Ignore right-clicks after the game has been won or lost
 			if (!running){
 				return;
 			}
 			this.flag();
+			
+			// Again, we don't want to re-record clicks while we're loading them
 			if (!loaded){
 				saveClick(this.row, this.column, 1);
 			}
 		};
 
-		//  For the mine that causes the loss
+		//  For the mine that causes the loss (do this when we click on a mine)
 		this.revealResponsibleMine = function(){	
 			$(this.element).html('!');
 			$(this.element).addClass('mine');
@@ -256,7 +295,7 @@ $(document).ready(function(){
 			$(this.element).html(this.adjacentMines);
 		};
 
-		//  Reveals a non-mine not to a mine
+		//  Reveals a non-mine not adjacent to a mine
 		this.revealNotAdjacent = function(){
 			$(this.element).addClass('uncovered');
 			$(this.element).html('');
@@ -295,7 +334,7 @@ $(document).ready(function(){
 			}
 		};
 
-		// Executes when the (covered) block is marked as a mine, during creation or loading of the minefield
+		// Executes when the (covered) block is designated a mine, during the creation or loading of the minefield
 		this.setMine = function() {
 			this.mine = true;
 			let adj = this.getAdj();
@@ -372,7 +411,11 @@ $(document).ready(function(){
 	function createMines(row, column) {
 		localStorage.savedMines = '';
 		let free = [];
+		
+		// Bubble: guarantees that the user won't click on a block adjacent to a mine
 		let bubble = ((height * width - totalMines) >= 9);	// 1 if we have enough space for a bubble; 0 if not
+		
+		// Free:  the list of available spaces which we'll choose from to select mines
 		for (let i = 0; i < height; i++) {
 			for (let j = 0; j < width; j++) {
 				if((Math.abs(i - row) > bubble) || (Math.abs(j - column) > bubble)) {
@@ -380,6 +423,8 @@ $(document).ready(function(){
 				}
 			}
 		}
+		
+		// Select (n = totalMines) mines
 		for(let n = 0; n < totalMines; n++) {
 			let rand = Math.floor(Math.random() * free.length);
 			let block = free[rand];
@@ -485,9 +530,13 @@ $(document).ready(function(){
 	// Take a date (in the form of milliseconds) and convert it into a human-readable 
 	// timer display in String form
 	function getTimeDisplay(ms) {
+		
+		// For any setting, the previous best time is initialized to infinity (until a new best time is recorded)
+		
 		if (!isFinite(ms)){
 			return 'none';
 		}
+		
 		let h2 = Math.floor(ms / (100 * 10 * 10 * 6 * 10 * 6 * 10));
 		ms %= (100 * 10 * 10 * 6 * 10 * 6 * 10);				// Hour tens-place
 		if (h2 > 9) { h2 = 9; }									// (10 hours per 10-hour)
