@@ -2,4 +2,4 @@
 
 Play here: https://granthr97.github.io/
 
-![screenshot](/screenshot)
+![screenshot](./screenshot.png)
