@@ -1,1 +1,5 @@
-# granthr97.github.io
+# minesweeper
+
+Play here: https://granthr97.github.io/
+
+![screenshot](/screenshot)
