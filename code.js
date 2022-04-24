@@ -1,5 +1,7 @@
 "use strict";
 $(document).ready(function(){
+
+    throw 'Deliberate error!';
 	
 	// Width & height: number of rows and columns of the grid
 	var width, height;
